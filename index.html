@@ -2,132 +2,560 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Biologie Fehlertrainer – Komplett</title>
+<title>Biologie Fehlertrainer – MC Version</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body { font-family: Arial, sans-serif; background:#eef1f4; padding:15px; }
-.box { background:#fff; max-width:720px; margin:auto; padding:20px; border-radius:12px; }
-h1 { text-align:center; }
-.level { font-weight:bold; margin-bottom:10px; }
-button {
-  width:100%; padding:14px; margin-top:10px;
-  font-size:16px; border:none; border-radius:8px;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh; padding: 20px;
 }
-.correct { background:#2ecc71; color:white; }
-.wrong { background:#e74c3c; color:white; }
-.stats { margin-top:15px; font-size:14px; }
-small { color:#666; }
+
+.container { max-width: 800px; margin: 0 auto; }
+.header { text-align: center; color: white; margin-bottom: 30px; }
+.header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+
+.progress-overview {
+  background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.progress-bars { display: grid; gap: 12px; margin-top: 15px; }
+.progress-item { display: flex; align-items: center; gap: 12px; }
+.progress-label { min-width: 140px; font-weight: 600; font-size: 14px; }
+.progress-bar {
+  flex: 1; height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; transition: width 0.5s ease; display: flex; align-items: center;
+  justify-content: center; color: white; font-weight: bold; font-size: 13px;
+}
+.level-a .progress-fill { background: #e74c3c; }
+.level-b .progress-fill { background: #f39c12; }
+.level-c .progress-fill { background: #2ecc71; }
+
+.card {
+  background: white; border-radius: 15px; padding: 30px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1); margin-bottom: 20px;
+}
+
+.level-badge {
+  display: inline-block; padding: 8px 16px; border-radius: 20px;
+  font-weight: bold; font-size: 14px; margin-bottom: 20px;
+}
+.badge-a { background: #fee; color: #e74c3c; }
+.badge-b { background: #fef5e7; color: #f39c12; }
+.badge-c { background: #eafaf1; color: #2ecc71; }
+
+.mode-switch {
+  display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;
+}
+
+.mode-btn {
+  padding: 10px 24px; border: 2px solid #667eea; border-radius: 8px;
+  font-weight: 600; cursor: pointer; transition: all 0.3s;
+  background: white; color: #667eea;
+}
+
+.mode-btn.active {
+  background: #667eea; color: white;
+}
+
+.question-box {
+  background: #f8f9fa; padding: 20px; border-radius: 10px;
+  margin-bottom: 20px; border-left: 4px solid #667eea;
+}
+
+.question-text {
+  font-size: 1.2em; font-weight: 600; color: #2c3e50;
+}
+
+.answer-box {
+  background: #fff; border: 2px solid #e0e0e0; border-radius: 10px;
+  padding: 15px; margin-bottom: 20px;
+}
+
+.answer-toggle {
+  cursor: pointer; color: #667eea; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.answer-content {
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e0e0;
+  color: #27ae60; font-weight: 500; line-height: 1.6; display: none;
+}
+
+.answer-content.show { display: block; }
+.arrow { transition: transform 0.3s; display: inline-block; }
+.arrow.rotated { transform: rotate(90deg); }
+
+.button-group {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;
+}
+
+button {
+  padding: 16px; font-size: 1.1em; font-weight: bold; border: none;
+  border-radius: 10px; cursor: pointer; transition: all 0.3s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+button:hover {
+  transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.btn-correct { background: #2ecc71; color: white; }
+.btn-correct:hover { background: #27ae60; }
+.btn-wrong { background: #e74c3c; color: white; }
+.btn-wrong:hover { background: #c0392b; }
+.btn-reset { background: #95a5a6; color: white; width: 100%; }
+.btn-reset:hover { background: #7f8c8d; }
+
+.mc-options { display: grid; gap: 12px; margin-bottom: 20px; }
+
+.mc-option {
+  padding: 15px 20px; background: #f8f9fa; border: 2px solid #e0e0e0;
+  border-radius: 10px; cursor: pointer; transition: all 0.3s;
+  font-size: 1.05em; text-align: left;
+}
+
+.mc-option:hover { background: #e8eaf6; border-color: #667eea; }
+.mc-option.correct { background: #d4edda; border-color: #28a745; }
+.mc-option.wrong { background: #f8d7da; border-color: #dc3545; }
+.mc-option.disabled { pointer-events: none; opacity: 0.7; }
+
+.mc-feedback {
+  padding: 15px; border-radius: 10px; margin-top: 15px;
+  font-weight: 600; display: none;
+}
+.mc-feedback.show { display: block; }
+.mc-feedback.correct {
+  background: #d4edda; color: #155724; border-left: 4px solid #28a745;
+}
+.mc-feedback.wrong {
+  background: #f8d7da; color: #721c24; border-left: 4px solid #e74c3c;
+}
+
+.mc-next-btn {
+  width: 100%; padding: 16px; background: #667eea; color: white;
+  border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold;
+  cursor: pointer; margin-top: 15px; display: none;
+}
+.mc-next-btn.show { display: block; }
+
+.category-filter {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;
+}
+
+.filter-btn {
+  padding: 8px 16px; background: #ecf0f1; border: 2px solid transparent;
+  border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn:hover { background: #bdc3c7; transform: none; box-shadow: none; }
+.filter-btn.active { background: #667eea; color: white; border-color: #667eea; }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px; margin-top: 20px;
+}
+
+.stat-card {
+  background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;
+}
+
+.stat-value { font-size: 2em; font-weight: bold; color: #667eea; }
+.stat-label { font-size: 0.9em; color: #7f8c8d; margin-top: 5px; }
+
+.hint {
+  background: #e8f4f8; padding: 12px; border-radius: 8px; font-size: 0.9em;
+  color: #34495e; margin-top: 15px; border-left: 4px solid #3498db;
+}
+
+@media (max-width: 600px) {
+  .header h1 { font-size: 1.8em; }
+  .button-group { grid-template-columns: 1fr; }
+}
 </style>
 </head>
-
 <body>
-<div class="box">
-<h1>🧠 Biologie Fehler-Trainer</h1>
-<div id="level" class="level"></div>
-<div id="question"></div>
-<div id="answer"></div>
-<button class="correct" onclick="mark(true)">Richtig</button>
-<button class="wrong" onclick="mark(false)">Falsch</button>
-<div id="stats" class="stats"></div>
-<small>Regel: richtig → Stufe hoch | falsch → Stufe runter</small>
+
+<div class="container">
+  <div class="header">
+    <h1>🧠 Biologie Fehler-Trainer</h1>
+    <p>Gezieltes Lernen durch intelligente Wiederholung</p>
+  </div>
+
+  <div class="progress-overview">
+    <h3 style="margin-bottom: 15px;">📊 Dein Lernfortschritt</h3>
+    <div class="progress-bars" id="progressBars"></div>
+    
+    <div class="category-filter" id="categoryFilter"></div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="totalQuestions">0</div>
+        <div class="stat-label">Fragen gesamt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="masteredCount">0</div>
+        <div class="stat-label">Beherrscht</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="percentMastered">0%</div>
+        <div class="stat-label">Fortschritt</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+      <div id="levelBadge"></div>
+      <div class="mode-switch">
+        <button class="mode-btn active" id="normalModeBtn" onclick="switchMode('normal')">Normal</button>
+        <button class="mode-btn" id="mcModeBtn" onclick="switchMode('mc')">Multiple Choice</button>
+      </div>
+    </div>
+    
+    <div class="question-box">
+      <div class="question-text" id="question"></div>
+    </div>
+
+    <!-- Normal Mode -->
+    <div id="normalMode">
+      <div class="answer-box">
+        <div class="answer-toggle" id="answerToggle">
+          <span class="arrow">▶</span>
+          <span>Antwort anzeigen</span>
+        </div>
+        <div class="answer-content" id="answerContent"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-correct" onclick="markNormal(true)">✓ Richtig gewusst</button>
+        <button class="btn-wrong" onclick="markNormal(false)">✗ Falsch / Unsicher</button>
+      </div>
+    </div>
+
+    <!-- MC Mode -->
+    <div id="mcMode" style="display: none;">
+      <div class="mc-options" id="mcOptions"></div>
+      <div class="mc-feedback" id="mcFeedback"></div>
+      <button class="mc-next-btn" id="mcNextBtn" onclick="nextMC()">Nächste Frage →</button>
+    </div>
+
+    <button class="btn-reset" onclick="resetProgress()">Fortschritt zurücksetzen</button>
+
+    <div class="hint">
+      💡 <strong>Tipp:</strong> Fragen auf Stufe A werden häufiger wiederholt. 
+      <span id="modeHint">Bei richtiger Antwort steigt die Frage eine Stufe auf.</span>
+    </div>
+  </div>
 </div>
 
 <script>
-let questions = JSON.parse(localStorage.getItem("bioTrainer")) || [
+const categories = {
+  "Wolf": "Wolf", "Zähmung & Zucht": "Zucht", "Hund": "Hund",
+  "Körpersprache": "Körpersprache", "Katze": "Katze",
+  "Gebisse": "Gebisse", "Ernährung": "Ernährung", "Transfer": "Transfer"
+};
 
-/* WOLF */
-{q:"Von welchem Tier stammen alle Haushunde ab?", a:"Vom Wolf.", l:0},
-{q:"Warum ist der Wolf ein Hetzjäger?", a:"Er verfolgt Beute über lange Strecken, bis sie erschöpft ist.", l:0},
-{q:"Warum ist Ausdauer für den Wolf wichtiger als Schnelligkeit?", a:"Weil die Beute müde wird.", l:0},
-{q:"Warum lebt der Wolf im Rudel?", a:"Höherer Jagderfolg und gemeinsame Jungenaufzucht.", l:0},
-{q:"Welche Sinnesleistung ist beim Wolf besonders stark?", a:"Der Geruchssinn.", l:0},
-{q:"Warum wäre Einzeljagd für Wölfe meist erfolglos?", a:"Beute ist oft größer oder schneller.", l:0},
-{q:"Welche Rolle spielt das Rudel für Jungtiere?", a:"Gemeinsame Versorgung und Schutz.", l:0},
-
-/* ZÄHMUNG & ZUCHT */
-{q:"Was bedeutet Zähmung?", a:"Verhaltensänderung durch den Menschen.", l:0},
-{q:"Was bedeutet Zucht?", a:"Gezielte Auswahl bestimmter Merkmale.", l:0},
-{q:"Was wird durch Zucht nicht verändert?", a:"Die Artzugehörigkeit.", l:0},
-{q:"Warum konnte der Wolf gezähmt werden?", a:"Wegen seines Rudel- und Sozialverhaltens.", l:0},
-{q:"Warum ist der Husky dem Wolf ähnlicher als der Pekinese?", a:"Weniger extreme Zucht.", l:0},
-{q:"Warum kann extreme Zucht gesundheitliche Probleme verursachen?", a:"Extreme Körpermerkmale schaden der Gesundheit.", l:0},
-
-/* HUND & ARBEIT */
-{q:"Warum eignen sich Hunde als Drogenspürhunde?", a:"Sehr guter Geruchssinn.", l:0},
-{q:"Warum eignen sich Hunde als Familienhunde?", a:"Sie sind Rudeltiere.", l:0},
-{q:"Warum sind nicht alle Hunde für jede Aufgabe geeignet?", a:"Unterschiedliche Zuchtziele.", l:0},
-
-/* KÖRPERSPRACHE */
-{q:"Was bedeutet ein eingezogener Schwanz beim Hund?", a:"Angst oder Unterwerfung.", l:0},
-{q:"Was zeigen gefletschte Zähne und aufgerichtete Ohren?", a:"Aggression.", l:0},
-{q:"Warum ist das Erkennen von Körpersprache wichtig?", a:"Zur Vermeidung von gefährlichen Situationen.", l:0},
-
-/* KATZE */
-{q:"Welche Jagdart nutzt die Katze?", a:"Schleichjagd.", l:0},
-{q:"Warum jagen Katzen meist allein?", a:"Überraschung ist entscheidend.", l:0},
-{q:"Welche Schritte gehören zur Katzenjagd?", a:"Anschleichen – Lauern – Sprung.", l:0},
-{q:"Warum wäre Rudeljagd für Katzen ungeeignet?", a:"Überraschung geht verloren.", l:0},
-{q:"Hauptunterschied Wolf- vs. Katzenjagd?", a:"Ausdauerjagd vs. Überraschungsjagd.", l:0},
-
-/* GEBISSE */
-{q:"Merkmal eines Fleischfressergebisses?", a:"Große Eck- und Reißzähne.", l:0},
-{q:"Funktion der Reißzähne?", a:"Zerschneiden von Fleisch.", l:0},
-{q:"Warum haben Pflanzenfresser breite Mahlzähne?", a:"Zum Zerkleinern pflanzlicher Nahrung.", l:0},
-{q:"Merkmal eines Nagergebisses?", a:"Lebenslang wachsende Schneidezähne.", l:0},
-{q:"Warum wachsen Nagerzähne lebenslang?", a:"Starke Abnutzung.", l:0},
-{q:"Warum ist der Mensch ein Allesfresser?", a:"Mischgebiss aus verschiedenen Zahnarten.", l:0},
-
-/* ERNÄHRUNG */
-{q:"Welche drei Hauptnährstoffe gibt es?", a:"Kohlenhydrate, Fette, Eiweiß.", l:0},
-{q:"Welcher Nährstoff liefert am meisten Energie?", a:"Fette.", l:0},
-{q:"Wofür braucht der Körper Eiweiß?", a:"Aufbau von Zellen und Muskeln.", l:0},
-{q:"Aufgabe der Kohlenhydrate?", a:"Energie liefern.", l:0},
-{q:"Warum sind Vitamine wichtig?", a:"Regeln Körperfunktionen.", l:0},
-{q:"Warum sind Mineralstoffe wichtig?", a:"Aufbau von Knochen und Zähnen.", l:0},
-{q:"Warum ist Wasser lebensnotwendig?", a:"Transport- und Stoffwechselprozesse.", l:0},
-{q:"Warum sind Ballaststoffe wichtig?", a:"Fördern die Verdauung.", l:0},
-
-/* SCHWIERIG / TRANSFER */
-{q:"Warum wäre ein Hund ohne Rudelverhalten kaum erziehbar?", a:"Keine soziale Orientierung.", l:0},
-{q:"Warum sind Hetzjäger ausdauernd gebaut?", a:"Lange Verfolgung der Beute.", l:0},
-{q:"Warum ist das Gebiss ein Hinweis auf die Ernährungsweise?", a:"Anpassung an Nahrung.", l:0},
-{q:"Warum führt falsche Zucht langfristig zu Problemen?", a:"Gesundheit leidet.", l:0}
-
+let questions = [
+  // WOLF
+  {q:"Von welchem Tier stammen alle Haushunde ab?", a:"Vom Wolf.", l:0, cat:"Wolf", mc:["Vom Fuchs","Vom Wolf","Vom Kojoten","Vom Schakal"], c:1},
+  {q:"Warum ist der Wolf ein Hetzjäger?", a:"Er verfolgt Beute über lange Strecken, bis sie erschöpft ist.", l:0, cat:"Wolf", mc:["Er schleicht sich an","Er verfolgt Beute über lange Strecken","Er lauert im Versteck","Er springt aus Bäumen"], c:1},
+  {q:"Warum ist Ausdauer für den Wolf wichtiger als Schnelligkeit?", a:"Weil die Beute müde wird.", l:0, cat:"Wolf"},
+  {q:"Warum lebt der Wolf im Rudel?", a:"Höherer Jagderfolg und gemeinsame Jungenaufzucht.", l:0, cat:"Wolf", mc:["Um schneller zu laufen","Höherer Jagderfolg und gemeinsame Jungenaufzucht","Nur zur Fortpflanzung","Um alleine zu jagen"], c:1},
+  {q:"Welche Sinnesleistung ist beim Wolf besonders stark?", a:"Der Geruchssinn.", l:0, cat:"Wolf", mc:["Das Sehvermögen","Der Geruchssinn","Der Geschmackssinn","Der Tastsinn"], c:1},
+  {q:"Warum wäre Einzeljagd für Wölfe meist erfolglos?", a:"Beute ist oft größer oder schneller.", l:0, cat:"Wolf"},
+  {q:"Welche Rolle spielt das Rudel für Jungtiere?", a:"Gemeinsame Versorgung und Schutz.", l:0, cat:"Wolf"},
+  {q:"Wie groß kann ein Wolf werden (Körperlänge)?", a:"100-150 cm.", l:0, cat:"Wolf", mc:["50-80 cm","100-150 cm","200-250 cm","70-90 cm"], c:1},
+  {q:"Wie schnell kann ein Wolf laufen?", a:"Bis zu 45 km/h.", l:0, cat:"Wolf", mc:["Bis zu 20 km/h","Bis zu 45 km/h","Bis zu 70 km/h","Bis zu 100 km/h"], c:1},
+  {q:"Warum wurde der Wolf in Europa fast ausgerottet?", a:"Durch Bevölkerungszunahme und Verkleinerung des Lebensraums.", l:0, cat:"Wolf"},
+  
+  // ZÄHMUNG & ZUCHT
+  {q:"Was bedeutet Zähmung?", a:"Verhaltensänderung durch den Menschen.", l:0, cat:"Zucht", mc:["Körperveränderung","Verhaltensänderung durch den Menschen","Größenveränderung","Farbveränderung"], c:1},
+  {q:"Was bedeutet Zucht?", a:"Gezielte Auswahl bestimmter Merkmale.", l:0, cat:"Zucht", mc:["Zufällige Vermehrung","Gezielte Auswahl bestimmter Merkmale","Wilde Paarung","Natürliche Auslese"], c:1},
+  {q:"Was wird durch Zucht nicht verändert?", a:"Die Artzugehörigkeit.", l:0, cat:"Zucht", mc:["Die Größe","Die Farbe","Die Artzugehörigkeit","Das Verhalten"], c:2},
+  {q:"Warum konnte der Wolf gezähmt werden?", a:"Wegen seines Rudel- und Sozialverhaltens.", l:0, cat:"Zucht"},
+  {q:"Warum ist der Husky dem Wolf ähnlicher als der Pekinese?", a:"Weniger extreme Zucht.", l:0, cat:"Zucht"},
+  {q:"Warum kann extreme Zucht gesundheitliche Probleme verursachen?", a:"Extreme Körpermerkmale schaden der Gesundheit.", l:0, cat:"Zucht"},
+  {q:"Vor wie vielen Jahren wurde der Wolf zum Haustier?", a:"Vor ca. 35.000 Jahren.", l:0, cat:"Zucht", mc:["Vor 5.000 Jahren","Vor 10.000 Jahren","Vor 35.000 Jahren","Vor 50.000 Jahren"], c:2},
+  
+  // HUND
+  {q:"Warum eignen sich Hunde als Drogenspürhunde?", a:"Sehr guter Geruchssinn.", l:0, cat:"Hund", mc:["Gutes Sehvermögen","Sehr guter Geruchssinn","Schnelligkeit","Größe"], c:1},
+  {q:"Warum eignen sich Hunde als Familienhunde?", a:"Sie sind Rudeltiere.", l:0, cat:"Hund"},
+  {q:"Warum sind nicht alle Hunde für jede Aufgabe geeignet?", a:"Unterschiedliche Zuchtziele.", l:0, cat:"Hund"},
+  {q:"Was übernimmt der Mensch bei der Hundehaltung?", a:"Die Rolle des 'Leittieres' (Alpha).", l:0, cat:"Hund"},
+  {q:"Wie viele Riechzellen hat ein Hund in der Nase?", a:"130 Millionen (Mensch: 20-30 Millionen).", l:0, cat:"Hund", mc:["10 Millionen","50 Millionen","130 Millionen","200 Millionen"], c:2},
+  
+  // KÖRPERSPRACHE
+  {q:"Was bedeutet ein eingezogener Schwanz beim Hund?", a:"Angst oder Unterwerfung.", l:0, cat:"Körpersprache", mc:["Freude","Angst oder Unterwerfung","Aggression","Neugier"], c:1},
+  {q:"Was zeigen gefletschte Zähne und aufgerichtete Ohren?", a:"Aggression.", l:0, cat:"Körpersprache", mc:["Freundlichkeit","Angst","Aggression","Müdigkeit"], c:2},
+  {q:"Warum ist das Erkennen von Körpersprache wichtig?", a:"Zur Vermeidung von gefährlichen Situationen.", l:0, cat:"Körpersprache"},
+  {q:"Welche Körpersprache zeigt ein aggressiver Hund?", a:"Aufgerichtete Ohrmuscheln, gefletschte Zähne, aufgerichteter Schwanz.", l:0, cat:"Körpersprache", mc:["Eingezogener Schwanz","Aufgerichtete Ohren und gefletschte Zähne","Wedelnder Schwanz","Gesenkter Kopf"], c:1},
+  
+  // KATZE
+  {q:"Welche Jagdart nutzt die Katze?", a:"Schleichjagd.", l:0, cat:"Katze", mc:["Hetzjagd","Schleichjagd","Rudeljagd","Ausdauerjagd"], c:1},
+  {q:"Warum jagen Katzen meist allein?", a:"Überraschung ist entscheidend.", l:0, cat:"Katze"},
+  {q:"Welche Schritte gehören zur Katzenjagd?", a:"Anschleichen – Lauern – Sprung.", l:0, cat:"Katze", mc:["Hetzen – Verfolgen – Fangen","Anschleichen – Lauern – Sprung","Rufen – Warten – Angriff","Rennen – Springen – Beißen"], c:1},
+  {q:"Warum wäre Rudeljagd für Katzen ungeeignet?", a:"Überraschung geht verloren.", l:0, cat:"Katze"},
+  {q:"Hauptunterschied Wolf- vs. Katzenjagd?", a:"Ausdauerjagd vs. Überraschungsjagd.", l:0, cat:"Katze"},
+  {q:"Von welchem Tier stammt die Hauskatze ab?", a:"Von der afrikanischen Wildkatze (Falbkatze).", l:0, cat:"Katze", mc:["Vom Tiger","Von der Falbkatze","Vom Löwen","Vom Leoparden"], c:1},
+  {q:"Seit wann ist die Katze ein Haustier?", a:"Seit ca. 15.000 bis 10.000 Jahren.", l:0, cat:"Katze"},
+  
+  // GEBISSE
+  {q:"Merkmal eines Fleischfressergebisses?", a:"Große Eck- und Reißzähne.", l:0, cat:"Gebisse", mc:["Breite Mahlzähne","Große Eck- und Reißzähne","Lange Schneidezähne","Keine Zähne"], c:1},
+  {q:"Funktion der Reißzähne?", a:"Zerschneiden von Fleisch.", l:0, cat:"Gebisse", mc:["Zermalmen von Pflanzen","Zerschneiden von Fleisch","Nagen","Kauen"], c:1},
+  {q:"Warum haben Pflanzenfresser breite Mahlzähne?", a:"Zum Zerkleinern pflanzlicher Nahrung.", l:0, cat:"Gebisse"},
+  {q:"Merkmal eines Nagergebisses?", a:"Lebenslang wachsende Schneidezähne.", l:0, cat:"Gebisse", mc:["Große Eckzähne","Lebenslang wachsende Schneidezähne","Keine Backenzähne","Kleine Mahlzähne"], c:1},
+  {q:"Warum wachsen Nagerzähne lebenslang?", a:"Starke Abnutzung.", l:0, cat:"Gebisse"},
+  {q:"Warum ist der Mensch ein Allesfresser?", a:"Mischgebiss aus verschiedenen Zahnarten.", l:0, cat:"Gebisse", mc:["Nur Schneidezähne","Mischgebiss aus verschiedenen Zahnarten","Nur Eckzähne","Nur Mahlzähne"], c:1},
+  
+  // ERNÄHRUNG
+  {q:"Welche drei Hauptnährstoffe gibt es?", a:"Kohlenhydrate, Fette, Eiweiß.", l:0, cat:"Ernährung", mc:["Vitamine, Mineralien, Wasser","Kohlenhydrate, Fette, Eiweiß","Zucker, Salz, Öl","Brot, Fleisch, Gemüse"], c:1},
+  {q:"Welcher Nährstoff liefert am meisten Energie?", a:"Fette.", l:0, cat:"Ernährung", mc:["Kohlenhydrate","Fette","Eiweiß","Vitamine"], c:1},
+  {q:"Wofür braucht der Körper Eiweiß?", a:"Aufbau von Zellen und Muskeln.", l:0, cat:"Ernährung", mc:["Nur für Energie","Aufbau von Zellen und Muskeln","Nur für Knochen","Für die Verdauung"], c:1},
+  {q:"Aufgabe der Kohlenhydrate?", a:"Energie liefern.", l:0, cat:"Ernährung"},
+  {q:"Warum sind Vitamine wichtig?", a:"Regeln Körperfunktionen.", l:0, cat:"Ernährung"},
+  {q:"Warum sind Mineralstoffe wichtig?", a:"Aufbau von Knochen und Zähnen.", l:0, cat:"Ernährung"},
+  {q:"Warum ist Wasser lebensnotwendig?", a:"Transport- und Stoffwechselprozesse.", l:0, cat:"Ernährung"},
+  {q:"Warum sind Ballaststoffe wichtig?", a:"Fördern die Verdauung.", l:0, cat:"Ernährung"},
+  {q:"Wo sind Kohlenhydrate enthalten?", a:"In Kartoffeln, Reis, Weizen, Roggen, Mais, Zucker.", l:0, cat:"Ernährung"},
+  {q:"Wo sind Eiweiße enthalten?", a:"In Fleisch, Wurst, Fisch, Milch, Eiern, Hülsenfrüchten.", l:0, cat:"Ernährung"},
+  
+  // TRANSFER
+  {q:"Warum wäre ein Hund ohne Rudelverhalten kaum erziehbar?", a:"Keine soziale Orientierung.", l:0, cat:"Transfer"},
+  {q:"Warum sind Hetzjäger ausdauernd gebaut?", a:"Lange Verfolgung der Beute.", l:0, cat:"Transfer"},
+  {q:"Warum ist das Gebiss ein Hinweis auf die Ernährungsweise?", a:"Anpassung an Nahrung.", l:0, cat:"Transfer", mc:["Größe des Tieres","Anpassung an Nahrung","Alter des Tieres","Geschlecht"], c:1},
+  {q:"Warum führt falsche Zucht langfristig zu Problemen?", a:"Gesundheit leidet.", l:0, cat:"Transfer"}
 ];
 
-let current;
+let currentQuestion, currentMode = 'normal', activeFilter = null, mcAnswered = false;
 
-function pick() {
-  let weighted=[];
-  questions.forEach((q,i)=>{
-    let w = q.l===0?5 : q.l===1?2 : 1;
-    for(let j=0;j<w;j++) weighted.push(i);
-  });
-  current = questions[ weighted[Math.floor(Math.random()*weighted.length)] ];
-  document.getElementById("level").innerText =
-    current.l===0?"Stufe A (neu)" : current.l===1?"Stufe B (unsicher)" : "Stufe C (sitzt)";
-  document.getElementById("question").innerHTML = "<b>Frage:</b> "+current.q;
-  document.getElementById("answer").innerHTML =
-    "<details><summary>Antwort anzeigen</summary>"+current.a+"</details>";
+function loadProgress() {
+  const saved = localStorage.getItem("bioTrainer");
+  if (saved) {
+    const savedData = JSON.parse(saved);
+    questions.forEach((q, i) => { if (savedData[i]) q.l = savedData[i].l; });
+  }
+}
+
+function saveProgress() {
+  localStorage.setItem("bioTrainer", JSON.stringify(questions));
+}
+
+function getFilteredQuestions() {
+  return activeFilter ? questions.filter(q => q.cat === activeFilter) : questions;
+}
+
+function pickQuestion() {
+  const pool = getFilteredQuestions();
+  
+  if (currentMode === 'mc') {
+    const mcPool = pool.filter(q => q.mc);
+    if (mcPool.length === 0) {
+      alert("Keine Multiple-Choice-Fragen in diesem Thema verfügbar!");
+      return;
+    }
+    let weighted = [];
+    mcPool.forEach(q => {
+      const weight = q.l === 0 ? 5 : q.l === 1 ? 2 : 1;
+      for (let j = 0; j < weight; j++) weighted.push(q);
+    });
+    currentQuestion = weighted[Math.floor(Math.random() * weighted.length)];
+  } else {
+    let weighted = [];
+    pool.forEach(q => {
+      const weight = q.l === 0 ? 5 : q.l === 1 ? 2 : 1;
+      for (let j = 0; j < weight; j++) weighted.push(q);
+    });
+    currentQuestion = weighted[Math.floor(Math.random() * weighted.length)];
+  }
+  
+  displayQuestion();
   updateStats();
 }
 
-function mark(ok){
-  if(ok && current.l<2) current.l++;
-  if(!ok && current.l>0) current.l--;
-  localStorage.setItem("bioTrainer", JSON.stringify(questions));
-  pick();
+function displayQuestion() {
+  const levelNames = ["Stufe A (neu)", "Stufe B (unsicher)", "Stufe C (sitzt)"];
+  const levelClasses = ["badge-a", "badge-b", "badge-c"];
+  
+  document.getElementById("levelBadge").innerHTML = 
+    `<span class="level-badge ${levelClasses[currentQuestion.l]}">${levelNames[currentQuestion.l]}</span>`;
+  document.getElementById("question").textContent = currentQuestion.q;
+  
+  if (currentMode === 'normal') {
+    document.getElementById("answerContent").textContent = currentQuestion.a;
+    const answerBox = document.getElementById("answerContent");
+    answerBox.classList.remove("show");
+    document.querySelector(".arrow").classList.remove("rotated");
+  } else {
+    displayMCOptions();
+  }
 }
 
-function updateStats(){
-  let a=questions.filter(q=>q.l===0).length;
-  let b=questions.filter(q=>q.l===1).length;
-  let c=questions.filter(q=>q.l===2).length;
-  document.getElementById("stats").innerText =
-    `A: ${a} | B: ${b} | C: ${c}  → Ziel: alles C`;
+function displayMCOptions() {
+  mcAnswered = false;
+  const optionsDiv = document.getElementById("mcOptions");
+  const feedbackDiv = document.getElementById("mcFeedback");
+  const nextBtn = document.getElementById("mcNextBtn");
+  
+  optionsDiv.innerHTML = '';
+  feedbackDiv.className = 'mc-feedback';
+  feedbackDiv.textContent = '';
+  nextBtn.classList.remove('show');
+  
+  if (!currentQuestion.mc) {
+    optionsDiv.innerHTML = '<p style="color: #7f8c8d;">Keine Multiple-Choice-Optionen verfügbar.</p>';
+    return;
+  }
+  
+  currentQuestion.mc.forEach((option, index) => {
+    const optionDiv = document.createElement('div');
+    optionDiv.className = 'mc-option';
+    optionDiv.textContent = option;
+    optionDiv.onclick = () => checkMCAnswer(index, optionDiv);
+    optionsDiv.appendChild(optionDiv);
+  });
 }
 
-pick();
+function checkMCAnswer(selected, element) {
+  if (mcAnswered) return;
+  mcAnswered = true;
+  
+  const correct = currentQuestion.c;
+  const options = document.querySelectorAll('.mc-option');
+  const feedbackDiv = document.getElementById("mcFeedback");
+  const nextBtn = document.getElementById("mcNextBtn");
+  
+  options.forEach(opt => opt.classList.add('disabled'));
+  
+  if (selected === correct) {
+    element.classList.add('correct');
+    feedbackDiv.className = 'mc-feedback correct show';
+    feedbackDiv.textContent = '✓ Richtig! ' + currentQuestion.a;
+    if (currentQuestion.l < 2) currentQuestion.l++;
+  } else {
+    element.classList.add('wrong');
+    options[correct].classList.add('correct');
+    feedbackDiv.className = 'mc-feedback wrong show';
+    feedbackDiv.textContent = '✗ Leider falsch. Richtige Antwort: ' + currentQuestion.a;
+    if (currentQuestion.l > 0) currentQuestion.l--;
+  }
+  
+  saveProgress();
+  nextBtn.classList.add('show');
+  updateStats();
+}
+
+function nextMC() {
+  pickQuestion();
+}
+
+function markNormal(correct) {
+  if (correct && currentQuestion.l < 2) {
+    currentQuestion.l++;
+  } else if (!correct && currentQuestion.l > 0) {
+    currentQuestion.l--;
+  }
+  saveProgress();
+  pickQuestion();
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  
+  document.getElementById('normalModeBtn').classList.toggle('active', mode === 'normal');
+  document.getElementById('mcModeBtn').classList.toggle('active', mode === 'mc');
+  
+  document.getElementById('normalMode').style.display = mode === 'normal' ? 'block' : 'none';
+  document.getElementById('mcMode').style.display = mode === 'mc' ? 'block' : 'none';
+  
+  const hint = mode === 'mc' 
+    ? 'Bei richtiger Antwort steigt die Frage eine Stufe auf. Bei falscher Antwort geht sie eine Stufe runter.'
+    : 'Bei richtiger Antwort steigt die Frage eine Stufe auf.';
+  document.getElementById('modeHint').textContent = hint;
+  
+  pickQuestion();
+}
+
+function updateStats() {
+  const pool = activeFilter ? getFilteredQuestions() : questions;
+  const levelA = pool.filter(q => q.l === 0).length;
+  const levelB = pool.filter(q => q.l === 1).length;
+  const levelC = pool.filter(q => q.l === 2).length;
+  const total = pool.length;
+  
+  const progressBars = document.getElementById("progressBars");
+  progressBars.innerHTML = `
+    <div class="progress-item level-a">
+      <div class="progress-label">🔴 Stufe A (neu)</div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: ${(levelA/total)*100}%">${levelA}</div>
+      </div>
+    </div>
+    <div class="progress-item level-b">
+      <div class="progress-label">🟡 Stufe B (unsicher)</div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: ${(levelB/total)*100}%">${levelB}</div>
+      </div>
+    </div>
+    <div class="progress-item level-c">
+      <div class="progress-label">🟢 Stufe C (sitzt)</div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: ${(levelC/total)*100}%">${levelC}</div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById("totalQuestions").textContent = total;
+  document.getElementById("masteredCount").textContent = levelC;
+  document.getElementById("percentMastered").textContent = Math.round((levelC / total) * 100) + "%";
+}
+
+function initCategoryFilter() {
+  const filterContainer = document.getElementById("categoryFilter");
+  
+  let html = '<button class="filter-btn active" onclick="setFilter(null)">Alle Themen</button>';
+  Object.keys(categories).forEach(cat => {
+    html += `<button class="filter-btn" onclick="setFilter('${categories[cat]}')">${cat}</button>`;
+  });
+  
+  filterContainer.innerHTML = html;
+}
+
+function setFilter(category) {
+  activeFilter = category;
+  
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.classList.remove("active");
+  });
+  event.target.classList.add("active");
+  
+  pickQuestion();
+}
+
+function resetProgress() {
+  if (confirm("Möchtest du wirklich deinen gesamten Fortschritt zurücksetzen?")) {
+    questions.forEach(q => q.l = 0);
+    saveProgress();
+    pickQuestion();
+  }
+}
+
+document.getElementById("answerToggle").addEventListener("click", function() {
+  const content = document.getElementById("answerContent");
+  const arrow = document.querySelector(".arrow");
+  content.classList.toggle("show");
+  arrow.classList.toggle("rotated");
+});
+
+loadProgress();
+initCategoryFilter();
+pickQuestion();
 </script>
+
 </body>
 </html>
